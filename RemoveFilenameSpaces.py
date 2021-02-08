@@ -19,15 +19,15 @@ def checkIfIgnored(current_directory):
             return False
     return True
 
-def iterateDirectories(current_directory, ignored_directories):
+def iterateDirectories(current_directory, ignored_directories, fileExtensionsToCheck):
     if checkIfIgnored(current_directory):
         try:
             for file in current_directory.iterdir():
                 if file.is_dir():
-                    iterateDirectories(file, ignored_directories)
+                    iterateDirectories(file, ignored_directories, fileExtensionsToCheck)
                 else:
-                    if getFileExtension(file.name) == '.py':
-                        print(f'space found in name {file}') if checkFile(file) else print(current_directory)
+                    if getFileExtension(file.name) in fileExtensionsToCheck:
+                        print(f'space found in name {file}') if checkFile(file) else None
         except:
             pass
 
@@ -37,5 +37,5 @@ def checkFile(file_name):
             return True
 
 if __name__ == "__main__":
-    iterateDirectories(Path.home(), ignored_directories)
+    iterateDirectories(Path.home(), ignored_directories, fileExtensionsToCheck)
     input("Press enter and exit")

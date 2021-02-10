@@ -16,7 +16,8 @@ class ChangeName():
         return new_name
 
     def commitNameChange(self, file_name, new_name):
-        print('\'{file_name.name}\' changed to \'{new_name}\' at {file_name}')
+        file_name.rename(f'{file_name.parent}/{new_name}')
+        print(f'\'{file_name.name}\' renamed to \'{new_name}\' at {file_name.parent}')
 
     def promptUser(self, file_name, new_name):
         print(f'\nFile found at {file_name}')
@@ -29,6 +30,15 @@ class ChangeName():
             self.commitNameChange(file_name, new_name)
             if self.logFile != None:
                 self.logFile.writelog(f'\'{file_name.name}\' changed to \'{new_name}\' at {file_name}')
+
+class LogFile:
+    def __init__(self, logfile):
+        self.logFile = logfile
+    
+    def writelog(self, text, timestamp=True):
+        log = open(self.logFile, 'at')
+        log.write(f'[{datetime.datetime.now()}] {text}\n') if timestamp else log.write(f'{text} \n')
+        log.close()
 
 def getFileExtension(file_name):
     return pathlib.Path(file_name).suffix
@@ -44,15 +54,6 @@ def checkFile(file_name):
         if character.isspace():
             return True
 
-class LogFile:
-    def __init__(self, logfile):
-        self.logFile = logfile
-    
-    def writelog(self, text, timestamp=True):
-        log = open(self.logFile, 'at')
-        log.write(f'[{datetime.datetime.now()}] {text}\n') if timestamp else log.write(f'{text} \n')
-        log.close()
-
 def main(current_directory, filenamechange, ignored_directories, extensions_to_check):
     if checkIfIgnored(current_directory):
         try:
@@ -67,8 +68,8 @@ def main(current_directory, filenamechange, ignored_directories, extensions_to_c
             print(error)
 
 if __name__ == "__main__":
+    print('Searching files...')
     changelog = LogFile('NameChangeLog.txt')
     filenamechange = ChangeName(changelog)
-    print('Searching files...')
     main(Path.home(), filenamechange, ignored_directories, extensions_to_check)
-    input('Press any key to exit.')
+    input('Couldn\'t find any more files. Press a key to exit.')
